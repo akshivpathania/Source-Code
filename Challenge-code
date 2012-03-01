@@ -1,0 +1,151 @@
+#include <fstream.h>
+#include <conio.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+void mfcmdl_x()
+{
+ int i,j;
+ cout<<"Creating Product Manufacturer and Model list....."<<endl;
+ fstream pro,tmp,tmp1,chk;
+ pro.open("products.txt",ios::in);
+ tmp.open("mfc_lst.txt",ios::out|ios::trunc);
+ tmp1.open("mdl_lst.txt",ios::out|ios::trunc);
+ chk.open("mdl_chk.txt",ios::out|ios::trunc);
+ char string[255];
+ char *ptr,*ptr1,*act_ptr,*act_ptr1,c[] = "manufacturer",d[]="model",mfc[20],mdl[20];
+ while(!pro.eof())
+  {
+   i=0;j=0;
+   ptr=NULL;
+   act_ptr=NULL;
+   ptr1=NULL;
+   act_ptr1=NULL;
+   pro.getline(string,255);
+   ptr=strstr(string, c);
+   ptr1=strstr(string,d);
+   for(;*(act_ptr)!='"';ptr++)
+    if(*ptr=='"'&&*(ptr+1)==':'&&*(ptr+2)=='"')
+     {
+      act_ptr=(ptr+3);
+      for(;*(act_ptr)!='"';act_ptr++)
+       {
+	mfc[i]=*(act_ptr);i++;
+	if(*(act_ptr+1)=='"')
+	 mfc[i]='\0';
+       }
+     }
+   for(;*(act_ptr1)!='"';ptr1++)
+    if(*ptr1=='"'&&*(ptr1+1)==':'&&*(ptr1+2)=='"')
+     {
+      act_ptr1=(ptr1+3);
+      for(;*(act_ptr1)!='"';act_ptr1++)
+       {
+	mdl[j]=*(act_ptr1);j++;
+	if(*(act_ptr1+1)=='"')
+	 mdl[j]='\0';
+       }
+     }
+   tmp<<mfc<<endl;
+   tmp1<<mdl<<endl;
+   chk<<mdl<<endl;
+ }
+ pro.close();
+ tmp.close();
+ tmp1.close();
+ chk.close();
+}
+int mod_chk(char x[],char y[])
+{
+ int flg=0;
+ char hlder[255], *trc;
+ fstream chk;
+ chk.open("mdl_chk.txt",ios::in);
+ while(!chk.eof())
+ {
+  trc=NULL;
+  chk.getline(hlder,255);
+  trc=strstr(x,hlder);
+  if(trc!=NULL && strcmpi(y,hlder)!=0)
+   flg++;
+ }
+ chk.close();
+ return flg;
+}
+void main()
+{
+ clrscr();
+ mfcmdl_x();
+ fstream pro,lst,mfc,mdl,res;
+ char listing[255],hlder[255],manufacturer[20],model[20],temp[30],sp_case[]="DURAGADGET";
+ char *manf,*modl,*spptr,*chk;
+ int i,flg,inctr,outctr;
+ mfc.open("mfc_lst.txt",ios::in);
+ mdl.open("mdl_lst.txt",ios::in);
+ res.open("result.txt",ios::out);
+ pro.open("products.txt",ios::in);
+ while(!mdl.eof())
+ {
+  mfc.getline(manufacturer,255);
+  mdl.getline(model,255);
+  pro.getline(hlder,255);
+  if(model[0]=='\0')
+   break;
+  else
+  {
+   cout<<manufacturer<<" "<<model<<" "<<endl;
+   res<<endl;
+   res<<hlder<<endl;
+   lst.open("listings.txt",ios::in);
+   outctr=0;
+   inctr=0;
+   while(!lst.eof())
+   {
+    manf=NULL;
+    modl=NULL;
+    spptr=NULL;
+    lst.getline(listing,255);
+    manf=strstr(listing,manufacturer);
+    modl=strstr(listing,model);
+    spptr=strstr(listing,sp_case);
+    outctr++;
+    if(manf!=NULL)
+    {
+     if(modl!=NULL)
+     {
+      for(i=0;i<strlen(model);i++)
+      {
+       temp[i]=*modl;
+       modl++;
+      }
+      temp[i]='\0';
+      if(strcmpi(model,temp)==0 && (*modl<48 || *modl>57))
+       {res<<listing<<endl;}
+      else
+       {inctr++;}
+     }
+     else if(spptr!=NULL && modl==NULL)
+     {
+      flg=0;
+      flg=mod_chk(listing,model);
+      if(flg==0)
+       res<<listing<<endl;
+      else
+       inctr++;
+     }
+     else
+      inctr++;
+    }
+    else
+     inctr++;
+   }
+   lst.close();
+   if(outctr==inctr)
+   res<<"No matches found..."<<endl;
+  }
+ }
+ mfc.close();
+ mdl.close();
+ res.close();
+ getch();
+}
