@@ -1,0 +1,17 @@
+Sortable Coding Challenge
+
+My entry for the Sortable coding challenge at http://sortable.com/blog/coding-challenge/.
+
+
+USAGE
+
+Run challeng.cpp in a CPP editor to create result.txt file as per the required format.
+
+INPUT: products.txt and listings.txt should be present in the same directory as the cpp code.
+
+OUTPUT: Generate result.txt file the same directory.
+
+TEMPORARY FILES: mfc_lst.txt, mdl_lst.txt and mdl_chk.txt are generated using function called mfcmdl_x() to create
+mentioned text file but can be bypassed by using comments(//mfcmdl_x()) if no new products are added to products.txt
+after the first run.
+**However, the three mentioned files are required to successfully generate the result.txt file.**
