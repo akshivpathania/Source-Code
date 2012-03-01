@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+/*This fucntion extracts manufacturer and model name to mfc_lst.txt and mdl_lst.txt respectively.
+  A copy file mdl_chk.txt is generated for generic listings testing.*/
 void mfcmdl_x()
 {
  int i,j;
@@ -22,8 +24,13 @@ void mfcmdl_x()
    ptr1=NULL;
    act_ptr1=NULL;
    pro.getline(string,255);
+   if(string[0]=='\0')
+    break;
+   else
+   {
    ptr=strstr(string, c);
    ptr1=strstr(string,d);
+   //Manufacturer extraction loop
    for(;*(act_ptr)!='"';ptr++)
     if(*ptr=='"'&&*(ptr+1)==':'&&*(ptr+2)=='"')
      {
@@ -35,6 +42,7 @@ void mfcmdl_x()
 	 mfc[i]='\0';
        }
      }
+   //Model extraction loop
    for(;*(act_ptr1)!='"';ptr1++)
     if(*ptr1=='"'&&*(ptr1+1)==':'&&*(ptr1+2)=='"')
      {
@@ -48,13 +56,17 @@ void mfcmdl_x()
      }
    tmp<<mfc<<endl;
    tmp1<<mdl<<endl;
+   //Copy file mdl_chk.txt generated.
    chk<<mdl<<endl;
+ }
  }
  pro.close();
  tmp.close();
  tmp1.close();
  chk.close();
 }
+/* Scans for present of model specific generic listings as in case of duragadget listings such that these files may be
+   attached to corresponding products only. */
 int mod_chk(char x[],char y[])
 {
  int flg=0;
@@ -75,6 +87,7 @@ int mod_chk(char x[],char y[])
 void main()
 {
  clrscr();
+ //May be bypassed after 1st run if no new products are added in subsequent executions.
  mfcmdl_x();
  fstream pro,lst,mfc,mdl,res;
  char listing[255],hlder[255],manufacturer[20],model[20],temp[30],sp_case[]="DURAGADGET";
@@ -93,6 +106,7 @@ void main()
    break;
   else
   {
+   //Displays the manufacturer and Model being compared currently.
    cout<<manufacturer<<" "<<model<<" "<<endl;
    res<<endl;
    res<<hlder<<endl;
@@ -124,24 +138,24 @@ void main()
       else
        {inctr++;}
      }
-     else if(spptr!=NULL && modl==NULL)
-     {
-      flg=0;
+     else if(spptr!=NULL && modl==NULL) //Although this function is currently specific to 'duragadget' case only
+     {                                  //it may be modified/enhanced by adding further generic listing strings 
+      flg=0;                            //and adding further speecial pointers and if-else cases.
       flg=mod_chk(listing,model);
       if(flg==0)
        res<<listing<<endl;
       else
-       inctr++;
+       inctr++; //Generic listing specific to certain models only.
      }
      else
-      inctr++;
+      inctr++;//Manufacturer matches but model doesnot.
     }
     else
-     inctr++;
+     inctr++;//manufacturer doesnot match to the given listing.
    }
    lst.close();
    if(outctr==inctr)
-   res<<"No matches found..."<<endl;
+   res<<"No matches found..."<<endl;//Default message in case of no listings found.
   }
  }
  mfc.close();
